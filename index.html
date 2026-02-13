@@ -3,24 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CipherX Pro | Advanced Encryption Suite</title>
-
+<title>CipherX Crypto Lab</title>
 <link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 </head>
-
 <body>
 
-<nav>
-  <div class="logo">⚡ CipherX Pro</div>
-</nav>
+<header>
+  <h1>CipherX Crypto Lab</h1>
+</header>
 
 <section class="hero">
-  <h1>Advanced Browser Encryption Suite</h1>
-  <p>Modern cryptographic toolkit for developers.</p>
+  <h2>Encrypt • Hash • Secure</h2>
 </section>
 
-<!-- HACKER TERMINAL -->
 <section class="terminal-section">
   <div class="terminal">
     <div class="terminal-header">
@@ -34,39 +29,31 @@
   </div>
 </section>
 
-<section class="section">
-  <div class="tool-box">
-
-    <div class="tool-header">> CipherX Crypto Lab</div>
+<section class="crypto-section">
+  <div class="card">
 
     <select id="algorithm">
       <option value="aes">AES</option>
       <option value="sha256">SHA-256</option>
-      <option value="sha512">SHA-512</option>
       <option value="base64">Base64</option>
-      <option value="rot13">ROT13</option>
     </select>
 
-    <textarea id="input" placeholder="Enter text..."></textarea>
-    <input id="key" placeholder="Secret key (AES only)">
+    <textarea id="inputText" placeholder="Enter text..."></textarea>
+
+    <input type="password" id="keyInput" placeholder="Enter key (for AES only)">
 
     <div class="buttons">
-      <button class="encrypt" id="encryptBtn">Encrypt / Hash</button>
-      <button class="decrypt" id="decryptBtn">Decrypt</button>
-      <button class="copy" id="copyBtn">Copy</button>
+      <button id="encryptBtn">Encrypt / Hash</button>
+      <button id="decryptBtn">Decrypt</button>
+      <button id="copyBtn">Copy</button>
     </div>
 
-    <div id="output" class="output"></div>
+    <textarea id="outputText" placeholder="Output..." readonly></textarea>
 
   </div>
 </section>
 
-<footer>
-© 2026 CipherX Pro | Educational Project
-</footer>
-
 <script src="crypto-js.min.js"></script>
 <script src="script.js"></script>
-
 </body>
 </html>
