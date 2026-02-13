@@ -1,128 +1,132 @@
-document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener("DOMContentLoaded", () => {
 
-const algorithm = document.getElementById("algorithm");
-const input = document.getElementById("input");
-const keyField = document.getElementById("key");
-const output = document.getElementById("output");
+  const algorithm = document.getElementById("algorithm");
+  const inputText = document.getElementById("inputText");
+  const keyInput = document.getElementById("keyInput");
+  const outputText = document.getElementById("outputText");
 
-const encryptBtn = document.getElementById("encryptBtn");
-const decryptBtn = document.getElementById("decryptBtn");
-const copyBtn = document.getElementById("copyBtn");
+  const encryptBtn = document.getElementById("encryptBtn");
+  const decryptBtn = document.getElementById("decryptBtn");
+  const copyBtn = document.getElementById("copyBtn");
 
-algorithm.addEventListener("change", function(){
-    keyField.disabled = algorithm.value !== "aes";
-    keyField.value = "";
-    output.innerText = "";
-});
+  // TERMINAL SAFE TYPING (NO innerHTML XSS)
+  const terminalLines = [
+    "Initializing CipherX...",
+    "Loading crypto engine...",
+    "AES module ready.",
+    "SHA-256 ready.",
+    "System secure ✔",
+    "Awaiting input..."
+  ];
 
-encryptBtn.addEventListener("click", encrypt);
-decryptBtn.addEventListener("click", decrypt);
-copyBtn.addEventListener("click", copyOutput);
+  let line = 0;
+  let char = 0;
+  const terminalText = document.getElementById("terminalText");
 
-function encrypt(){
-    const algo = algorithm.value;
-    const text = input.value;
-    if(!text){ output.innerText="Enter text first."; return; }
+  function typeEffect(){
+    if(line < terminalLines.length){
+      if(char < terminalLines[line].length){
+        terminalText.textContent += terminalLines[line][char];
+        char++;
+        setTimeout(typeEffect, 40);
+      } else {
+        terminalText.textContent += "\n";
+        line++;
+        char = 0;
+        setTimeout(typeEffect, 300);
+      }
+    }
+  }
+  typeEffect();
 
+  // INPUT LIMIT PROTECTION (Prevent DoS)
+  const MAX_LENGTH = 10000;
+
+  encryptBtn.addEventListener("click", () => {
     try{
-        let result="";
-        switch(algo){
-            case "aes":
-                if(!keyField.value){ output.innerText="Enter secret key."; return; }
-                result = CryptoJS.AES.encrypt(text,keyField.value).toString();
-                break;
-            case "sha256":
-                result = CryptoJS.SHA256(text).toString();
-                break;
-            case "sha512":
-                result = CryptoJS.SHA512(text).toString();
-                break;
-            case "base64":
-                result = btoa(unescape(encodeURIComponent(text)));
-                break;
-            case "rot13":
-                result = text.replace(/[a-zA-Z]/g,c=>{
-                    const base=c<="Z"?65:97;
-                    return String.fromCharCode((c.charCodeAt(0)-base+13)%26+base);
-                });
-        }
-        output.innerText=result;
-    }catch{
-        output.innerText="Encryption failed.";
+      const text = inputText.value.trim();
+      if(text.length > MAX_LENGTH){
+        throw new Error("Input too large");
+      }
+
+      if(!text){
+        throw new Error("Input required");
+      }
+
+      let result;
+
+      switch(algorithm.value){
+
+        case "aes":
+          if(!keyInput.value){
+            throw new Error("Key required for AES");
+          }
+          result = CryptoJS.AES.encrypt(text, keyInput.value).toString();
+          break;
+
+        case "sha256":
+          result = CryptoJS.SHA256(text).toString();
+          break;
+
+        case "base64":
+          result = btoa(text);
+          break;
+
+        default:
+          throw new Error("Invalid algorithm");
+      }
+
+      outputText.value = result;
+
+    } catch(err){
+      outputText.value = "Error: " + err.message;
     }
-}
+  });
 
-function decrypt(){
-    const algo=algorithm.value;
-    const text=input.value;
-    if(!text){ output.innerText="Enter text first."; return; }
-
+  decryptBtn.addEventListener("click", () => {
     try{
-        let result="";
-        switch(algo){
-            case "aes":
-                if(!keyField.value){ output.innerText="Enter secret key."; return; }
-                result=CryptoJS.AES.decrypt(text,keyField.value).toString(CryptoJS.enc.Utf8);
-                if(!result){ output.innerText="Invalid key or data."; return; }
-                break;
-            case "base64":
-                result=decodeURIComponent(escape(atob(text)));
-                break;
-            case "rot13":
-                result=text.replace(/[a-zA-Z]/g,c=>{
-                    const base=c<="Z"?65:97;
-                    return String.fromCharCode((c.charCodeAt(0)-base+13)%26+base);
-                });
-                break;
-            default:
-                output.innerText="Hashes cannot be decrypted.";
-                return;
-        }
-        output.innerText=result;
-    }catch{
-        output.innerText="Decryption failed.";
+      const text = inputText.value.trim();
+      if(!text){
+        throw new Error("Input required");
+      }
+
+      let result;
+
+      switch(algorithm.value){
+
+        case "aes":
+          if(!keyInput.value){
+            throw new Error("Key required for AES");
+          }
+          const bytes = CryptoJS.AES.decrypt(text, keyInput.value);
+          result = bytes.toString(CryptoJS.enc.Utf8);
+          if(!result){
+            throw new Error("Wrong key or invalid ciphertext");
+          }
+          break;
+
+        case "base64":
+          result = atob(text);
+          break;
+
+        default:
+          throw new Error("Decryption not supported");
+      }
+
+      outputText.value = result;
+
+    } catch(err){
+      outputText.value = "Error: " + err.message;
     }
-}
+  });
 
-function copyOutput(){
-    const text=output.innerText;
-    if(!text){ output.innerText="Nothing to copy."; return; }
-    navigator.clipboard.writeText(text).then(()=>{
-        const original=text;
-        output.innerText="Copied!";
-        setTimeout(()=>{ output.innerText=original; },1000);
-    });
-}
-
-/* TERMINAL ANIMATION */
-const terminalLines=[
-"Initializing CipherX Pro...",
-"Loading cryptographic modules...",
-"AES engine ready.",
-"SHA hashing ready.",
-"System secure ✔",
-"Awaiting user input..."
-];
-
-let lineIndex=0;
-let charIndex=0;
-const terminalElement=document.getElementById("terminalText");
-
-function typeTerminal(){
-    if(lineIndex<terminalLines.length){
-        if(charIndex<terminalLines[lineIndex].length){
-            terminalElement.innerHTML+=terminalLines[lineIndex].charAt(charIndex);
-            charIndex++;
-            setTimeout(typeTerminal,40);
-        }else{
-            terminalElement.innerHTML+="\n";
-            lineIndex++;
-            charIndex=0;
-            setTimeout(typeTerminal,400);
-        }
+  copyBtn.addEventListener("click", async () => {
+    try{
+      await navigator.clipboard.writeText(outputText.value);
+      alert("Copied!");
+    } catch{
+      alert("Copy failed.");
     }
-}
-
-typeTerminal();
+  });
 
 });
