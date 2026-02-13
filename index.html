@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CipherX Pro | Advanced Encryption Suite</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#0b0f19;
+  --card:#0f172a;
+  --border:#1e293b;
+  --accent:#00f0ff;
+  --green:#00ff88;
+  --text:#ffffff;
+}
+
+body.light{
+  --bg:#f3f4f6;
+  --card:#ffffff;
+  --border:#e5e7eb;
+  --accent:#2563eb;
+  --green:#16a34a;
+  --text:#111827;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
+body{background:var(--bg);color:var(--text);transition:.3s;}
+
+nav{
+  display:flex;
+  justify-content:space-between;
+  padding:25px 8%;
+  align-items:center;
+}
+.logo{font-weight:700;font-size:20px;color:var(--accent);}
+nav button{
+  padding:8px 15px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  background:var(--accent);
+  color:black;
+  font-weight:600;
+}
+
+.hero{
+  text-align:center;
+  padding:90px 20px 70px;
+}
+.hero h1{
+  font-size:48px;
+  background:linear-gradient(90deg,var(--accent),#8b5cf6);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.hero p{
+  margin:20px auto;
+  max-width:600px;
+  opacity:.8;
+}
+.hero button{
+  padding:14px 28px;
+  background:var(--accent);
+  border:none;
+  border-radius:8px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.section{
+  padding:80px 8%;
+}
+
+.tool-box{
+  max-width:950px;
+  margin:auto;
+  background:var(--card);
+  border-radius:12px;
+  padding:40px;
+  border:1px solid var(--border);
+}
+
+.tool-header{
+  font-family:'Fira Code',monospace;
+  color:var(--green);
+  margin-bottom:20px;
+}
+
+select,textarea,input{
+  width:100%;
+  padding:12px;
+  margin-bottom:15px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:black;
+  color:var(--green);
+  font-family:'Fira Code',monospace;
+}
+
+body.light select,
+body.light textarea,
+body.light input{
+  background:#f9fafb;
+  color:#111827;
+}
+
+.buttons{
+  display:flex;
+  flex-wrap:wrap;
+  gap:15px;
+}
+
+button.action{
+  padding:10px 20px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.encrypt{background:var(--green);color:black;}
+.decrypt{background:var(--accent);color:black;}
+.copy{background:#8b5cf6;color:white;}
+.generate{background:#f59e0b;color:black;}
+
+.output{
+  margin-top:20px;
+  padding:15px;
+  min-height:60px;
+  border-radius:6px;
+  background:black;
+  color:var(--green);
+  font-family:'Fira Code',monospace;
+}
+
+body.light .output{
+  background:#f3f4f6;
+  color:#111827;
+}
+
+.info{
+  margin-top:25px;
+  padding:15px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  font-size:14px;
+  opacity:.9;
+}
+
+.strength{
+  margin-top:10px;
+  font-weight:600;
+}
+
+footer{
+  text-align:center;
+  padding:50px;
+  opacity:.6;
+  font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+  <div class="logo">⚡ CipherX Pro</div>
+  <button onclick="toggleTheme()">Toggle Theme</button>
+</nav>
+
+<section class="hero">
+  <h1>Advanced Browser Encryption Suite</h1>
+  <p>Modern cryptographic toolkit for developers, security engineers, and privacy enthusiasts.</p>
+  <button onclick="document.getElementById('lab').scrollIntoView({behavior:'smooth'})">Launch Crypto Lab</button>
+</section>
+
+<section id="lab" class="section">
+  <div class="tool-box">
+
+    <div class="tool-header">> CipherX Advanced Crypto Terminal</div>
+
+    <select id="algorithm">
+      <option value="aes">AES</option>
+      <option value="tripledes">TripleDES</option>
+      <option value="rabbit">Rabbit</option>
+      <option value="sha256">SHA-256</option>
+      <option value="sha512">SHA-512</option>
+      <option value="md5">MD5</option>
+      <option value="base64">Base64</option>
+      <option value="hex">HEX Encode</option>
+      <option value="rot13">ROT13</option>
+      <option value="caesar">Caesar Cipher</option>
+    </select>
+
+    <textarea id="input" placeholder="Enter text..."></textarea>
+
+    <input id="key" placeholder="Secret key (for symmetric algorithms)">
+    <input id="shift" type="number" placeholder="Shift value (for Caesar)">
+
+    <div class="buttons">
+      <button class="action encrypt" onclick="encrypt()">Encrypt / Hash</button>
+      <button class="action decrypt" onclick="decrypt()">Decrypt</button>
+      <button class="action generate" onclick="generateKey()">Generate Key</button>
+      <button class="action copy" onclick="copyOutput()">Copy</button>
+    </div>
+
+    <div id="output" class="output"></div>
+
+    <div id="strength" class="strength"></div>
+
+    <div id="info" class="info"></div>
+
+  </div>
+</section>
+
+<footer>
+© 2026 CipherX Pro | Cybersecurity Portfolio Project
+</footer>
+
+<script>
+const infoMap={
+aes:"AES: Advanced Encryption Standard (symmetric block cipher).",
+tripledes:"TripleDES: Legacy symmetric encryption algorithm.",
+rabbit:"Rabbit: High-speed stream cipher.",
+sha256:"SHA-256: Secure one-way cryptographic hash.",
+sha512:"SHA-512: Strong 512-bit hash function.",
+md5:"MD5: Legacy hash (not secure for passwords).",
+base64:"Base64: Encoding scheme (not encryption).",
+hex:"HEX: Encodes text into hexadecimal format.",
+rot13:"ROT13: Simple substitution cipher.",
+caesar:"Caesar Cipher: Shift-based substitution cipher."
+};
+
+document.getElementById("algorithm").addEventListener("change",e=>{
+document.getElementById("info").innerText=infoMap[e.target.value];
+});
+
+function encrypt(){
+let algo=algorithm.value;
+let text=input.value;
+let keyVal=key.value;
+let shiftVal=parseInt(shift.value)||0;
+let result="";
+try{
+switch(algo){
+case"aes":result=CryptoJS.AES.encrypt(text,keyVal).toString();break;
+case"tripledes":result=CryptoJS.TripleDES.encrypt(text,keyVal).toString();break;
+case"rabbit":result=CryptoJS.Rabbit.encrypt(text,keyVal).toString();break;
+case"sha256":result=CryptoJS.SHA256(text).toString();break;
+case"sha512":result=CryptoJS.SHA512(text).toString();break;
+case"md5":result=CryptoJS.MD5(text).toString();break;
+case"base64":result=btoa(text);break;
+case"hex":result=CryptoJS.enc.Hex.stringify(CryptoJS.enc.Utf8.parse(text));break;
+case"rot13":result=text.replace(/[a-zA-Z]/g,c=>String.fromCharCode((c<="Z"?90:122)>=(c=c.charCodeAt(0)+13)?c:c-26));break;
+case"caesar":result=text.replace(/[a-z]/gi,char=>{
+let base=char<='Z'?65:97;
+return String.fromCharCode((char.charCodeAt(0)-base+shiftVal)%26+base);
+});break;
+}
+output.innerText=result;
+evaluateStrength(keyVal);
+}catch{output.innerText="Error";}
+}
+
+function decrypt(){
+let algo=algorithm.value;
+let text=input.value;
+let keyVal=key.value;
+let shiftVal=parseInt(shift.value)||0;
+let result="";
+try{
+switch(algo){
+case"aes":result=CryptoJS.AES.decrypt(text,keyVal).toString(CryptoJS.enc.Utf8);break;
+case"tripledes":result=CryptoJS.TripleDES.decrypt(text,keyVal).toString(CryptoJS.enc.Utf8);break;
+case"rabbit":result=CryptoJS.Rabbit.decrypt(text,keyVal).toString(CryptoJS.enc.Utf8);break;
+case"base64":result=atob(text);break;
+case"hex":result=CryptoJS.enc.Hex.parse(text).toString(CryptoJS.enc.Utf8);break;
+case"rot13":result=text.replace(/[a-zA-Z]/g,c=>String.fromCharCode((c<="Z"?90:122)>=(c=c.charCodeAt(0)+13)?c:c-26));break;
+case"caesar":result=text.replace(/[a-z]/gi,char=>{
+let base=char<='Z'?65:97;
+return String.fromCharCode((char.charCodeAt(0)-base-shiftVal+26)%26+base);
+});break;
+default:result="Hash cannot be decrypted.";
+}
+output.innerText=result||"Invalid key/input.";
+}catch{output.innerText="Failed";}
+}
+
+function generateKey(){
+let keyStr=CryptoJS.lib.WordArray.random(16).toString();
+key.value=keyStr;
+evaluateStrength(keyStr);
+}
+
+function evaluateStrength(keyVal){
+if(!keyVal){strength.innerText="";return;}
+let score=keyVal.length;
+if(score<8)strength.innerText="Strength: Weak";
+else if(score<16)strength.innerText="Strength: Moderate";
+else strength.innerText="Strength: Strong";
+}
+
+function copyOutput(){
+navigator.clipboard.writeText(output.innerText);
+}
+
+function toggleTheme(){
+document.body.classList.toggle("light");
+}
+</script>
+
+</body>
+</html>
