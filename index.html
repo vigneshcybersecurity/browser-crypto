@@ -3,27 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>CipherX Pro | Advanced Encryption Suite</title>
-<meta name="description" content="Browser-based encryption and hashing suite built with HTML, CSS, and JavaScript.">
-
-<!-- Security Headers -->
-<meta http-equiv="X-Content-Type-Options" content="nosniff">
-<meta http-equiv="X-Frame-Options" content="DENY">
-<meta http-equiv="Referrer-Policy" content="no-referrer">
-<meta http-equiv="Content-Security-Policy"
-content="default-src 'self';
-script-src 'self';
-style-src 'self' https://fonts.googleapis.com;
-font-src https://fonts.gstatic.com;
-object-src 'none';
-frame-ancestors 'none';">
 
 <link rel="stylesheet" href="style.css">
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-
 </head>
+
 <body>
 
 <nav>
@@ -32,7 +17,21 @@ frame-ancestors 'none';">
 
 <section class="hero">
   <h1>Advanced Browser Encryption Suite</h1>
-  <p>Modern cryptographic toolkit for developers and cybersecurity professionals.</p>
+  <p>Modern cryptographic toolkit for developers.</p>
+</section>
+
+<!-- HACKER TERMINAL -->
+<section class="terminal-section">
+  <div class="terminal">
+    <div class="terminal-header">
+      <span class="dot red"></span>
+      <span class="dot yellow"></span>
+      <span class="dot green"></span>
+    </div>
+    <div class="terminal-body">
+      <span id="terminalText"></span><span class="cursor">|</span>
+    </div>
+  </div>
 </section>
 
 <section class="section">
@@ -49,7 +48,7 @@ frame-ancestors 'none';">
     </select>
 
     <textarea id="input" placeholder="Enter text..."></textarea>
-    <input id="key" placeholder="Secret key (for AES only)">
+    <input id="key" placeholder="Secret key (AES only)">
 
     <div class="buttons">
       <button class="encrypt" id="encryptBtn">Encrypt / Hash</button>
@@ -59,18 +58,13 @@ frame-ancestors 'none';">
 
     <div id="output" class="output"></div>
 
-    <div class="info">
-      ⚠️ Educational cryptography demo. Not intended for production security.
-    </div>
-
   </div>
 </section>
 
 <footer>
-© 2026 CipherX Pro | Educational Cryptography Project
+© 2026 CipherX Pro | Educational Project
 </footer>
 
-<!-- Local CryptoJS -->
 <script src="crypto-js.min.js"></script>
 <script src="script.js"></script>
 
