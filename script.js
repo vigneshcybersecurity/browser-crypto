@@ -1,3 +1,5 @@
+document.addEventListener("DOMContentLoaded", function(){
+
 const algorithm = document.getElementById("algorithm");
 const input = document.getElementById("input");
 const keyField = document.getElementById("key");
@@ -7,154 +9,120 @@ const encryptBtn = document.getElementById("encryptBtn");
 const decryptBtn = document.getElementById("decryptBtn");
 const copyBtn = document.getElementById("copyBtn");
 
-// Event Listeners
-encryptBtn.addEventListener("click", encrypt);
-decryptBtn.addEventListener("click", decrypt);
-copyBtn.addEventListener("click", copyOutput);
-
-// Disable key unless AES
-algorithm.addEventListener("change", () => {
+algorithm.addEventListener("change", function(){
     keyField.disabled = algorithm.value !== "aes";
     keyField.value = "";
     output.innerText = "";
 });
 
-// ---------- ENCRYPT ----------
-function encrypt() {
+encryptBtn.addEventListener("click", encrypt);
+decryptBtn.addEventListener("click", decrypt);
+copyBtn.addEventListener("click", copyOutput);
+
+function encrypt(){
     const algo = algorithm.value;
     const text = input.value;
+    if(!text){ output.innerText="Enter text first."; return; }
 
-    if (!text) {
-        output.innerText = "Please enter text.";
-        return;
-    }
-
-    try {
-        let result = "";
-
-        switch (algo) {
+    try{
+        let result="";
+        switch(algo){
             case "aes":
-                const key = keyField.value;
-                if (!key) {
-                    output.innerText = "AES requires a secret key.";
-                    return;
-                }
-                result = CryptoJS.AES.encrypt(text, key).toString();
+                if(!keyField.value){ output.innerText="Enter secret key."; return; }
+                result = CryptoJS.AES.encrypt(text,keyField.value).toString();
                 break;
-
             case "sha256":
                 result = CryptoJS.SHA256(text).toString();
                 break;
-
             case "sha512":
                 result = CryptoJS.SHA512(text).toString();
                 break;
-
             case "base64":
-                result = base64Encode(text);
+                result = btoa(unescape(encodeURIComponent(text)));
                 break;
-
             case "rot13":
-                result = rot13(text);
-                break;
+                result = text.replace(/[a-zA-Z]/g,c=>{
+                    const base=c<="Z"?65:97;
+                    return String.fromCharCode((c.charCodeAt(0)-base+13)%26+base);
+                });
         }
-
-        output.innerText = result;
-
-    } catch (err) {
-        output.innerText = "Encryption error.";
+        output.innerText=result;
+    }catch{
+        output.innerText="Encryption failed.";
     }
 }
 
-// ---------- DECRYPT ----------
-function decrypt() {
-    const algo = algorithm.value;
-    const text = input.value;
+function decrypt(){
+    const algo=algorithm.value;
+    const text=input.value;
+    if(!text){ output.innerText="Enter text first."; return; }
 
-    if (!text) {
-        output.innerText = "Please enter text.";
-        return;
-    }
-
-    try {
-        let result = "";
-
-        switch (algo) {
+    try{
+        let result="";
+        switch(algo){
             case "aes":
-                const key = keyField.value;
-                if (!key) {
-                    output.innerText = "AES requires a secret key.";
-                    return;
-                }
-
-                const decrypted = CryptoJS.AES.decrypt(text, key);
-                result = decrypted.toString(CryptoJS.enc.Utf8);
-
-                if (!result) {
-                    output.innerText = "Invalid key or corrupted data.";
-                    return;
-                }
+                if(!keyField.value){ output.innerText="Enter secret key."; return; }
+                result=CryptoJS.AES.decrypt(text,keyField.value).toString(CryptoJS.enc.Utf8);
+                if(!result){ output.innerText="Invalid key or data."; return; }
                 break;
-
             case "base64":
-                result = base64Decode(text);
+                result=decodeURIComponent(escape(atob(text)));
                 break;
-
             case "rot13":
-                result = rot13(text);
+                result=text.replace(/[a-zA-Z]/g,c=>{
+                    const base=c<="Z"?65:97;
+                    return String.fromCharCode((c.charCodeAt(0)-base+13)%26+base);
+                });
                 break;
-
             default:
-                output.innerText = "Hash functions cannot be decrypted.";
+                output.innerText="Hashes cannot be decrypted.";
                 return;
         }
-
-        output.innerText = result;
-
-    } catch (err) {
-        output.innerText = "Decryption failed.";
+        output.innerText=result;
+    }catch{
+        output.innerText="Decryption failed.";
     }
 }
 
-// ---------- UTILITIES ----------
-
-// Unicode-safe Base64
-function base64Encode(str) {
-    return btoa(unescape(encodeURIComponent(str)));
-}
-
-function base64Decode(str) {
-    return decodeURIComponent(escape(atob(str)));
-}
-
-// Clean ROT13
-function rot13(str) {
-    return str.replace(/[a-zA-Z]/g, function (char) {
-        const base = char <= "Z" ? 65 : 97;
-        return String.fromCharCode(
-            (char.charCodeAt(0) - base + 13) % 26 + base
-        );
+function copyOutput(){
+    const text=output.innerText;
+    if(!text){ output.innerText="Nothing to copy."; return; }
+    navigator.clipboard.writeText(text).then(()=>{
+        const original=text;
+        output.innerText="Copied!";
+        setTimeout(()=>{ output.innerText=original; },1000);
     });
 }
 
-// Clipboard
-function copyOutput() {
-    const text = output.innerText;
+/* TERMINAL ANIMATION */
+const terminalLines=[
+"Initializing CipherX Pro...",
+"Loading cryptographic modules...",
+"AES engine ready.",
+"SHA hashing ready.",
+"System secure ✔",
+"Awaiting user input..."
+];
 
-    if (!text) {
-        output.innerText = "Nothing to copy.";
-        return;
+let lineIndex=0;
+let charIndex=0;
+const terminalElement=document.getElementById("terminalText");
+
+function typeTerminal(){
+    if(lineIndex<terminalLines.length){
+        if(charIndex<terminalLines[lineIndex].length){
+            terminalElement.innerHTML+=terminalLines[lineIndex].charAt(charIndex);
+            charIndex++;
+            setTimeout(typeTerminal,40);
+        }else{
+            terminalElement.innerHTML+="\n";
+            lineIndex++;
+            charIndex=0;
+            setTimeout(typeTerminal,400);
+        }
     }
-
-    navigator.clipboard.writeText(text)
-        .then(() => {
-            const original = text;
-            output.innerText = "Copied!";
-            setTimeout(() => {
-                output.innerText = original;
-            }, 1200);
-        })
-        .catch(() => {
-            output.innerText = "Clipboard permission denied.";
-        });
 }
+
+typeTerminal();
+
+});
